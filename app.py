@@ -53,7 +53,6 @@ def lambda_handler(event, context):
         code_pipeline.put_job_success_result(
             jobId=job_id,
         )
-    return {'hello': 'world'}
 
 
 @app.route('/')
