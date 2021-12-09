@@ -1,1 +1,1 @@
-# aws-cloudfront-invalidator
+# aws cloudfront invalidator
