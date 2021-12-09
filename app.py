@@ -54,3 +54,9 @@ def lambda_handler(event, context):
         )
     return {'hello': 'world'}
 
+
+@app.route('/')
+def index():
+    return {
+        'lambda': 'aws cloud front'
+    }
