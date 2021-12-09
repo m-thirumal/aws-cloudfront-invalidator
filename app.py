@@ -4,8 +4,9 @@ import logging
 
 from chalice import Chalice
 
-app = Chalice(app_name='aws-cloudfront-invalidator')
-
+app = Chalice(app_name='aws-cloudfront-invalidator', debug=True, configure_logs=False)
+app.debug = True
+logging.getLogger().setLevel(logging.DEBUG)
 # -----------------------------------
 # @Author       : Thirumal
 # @Email        : m.thirumal@hotmail.com
