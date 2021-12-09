@@ -1,29 +1,56 @@
+import json
+import boto3
+import logging
+
 from chalice import Chalice
 
 app = Chalice(app_name='aws-cloudfront-invalidator')
 
+# -----------------------------------
+# @Author       : Thirumal
+# @Email        : m.thirumal@hotmail.com
+# @Phone number : +91-8973697871
+# Github        : m-thirumal
+# Twitter       : _thirumal
+# -----------------------------------
 
-@app.route('/')
-def index():
+code_pipeline = boto3.client("codepipeline")
+cloud_front = boto3.client("cloudfront")
+
+
+def lambda_handler(event, context):
+    logging.debug("AWS cloud front invalidator started with event {}".format(event))
+    job_id = event["CodePipeline.job"]["id"]
+    logging.debug("Code pipeline job id is {}".format(job_id))
+    try:
+        user_params = json.loads(
+            event["CodePipeline.job"]
+            ["data"]
+            ["actionConfiguration"]
+            ["configuration"]
+            ["UserParameters"]
+        )
+        cloud_front.create_invalidation(
+            DistributionId=user_params["distributionId"],
+            InvalidationBatch={
+                "Paths": {
+                    "Quantity": len(user_params["objectPaths"]),
+                    "Items": user_params["objectPaths"],
+                },
+                "CallerReference": event["CodePipeline.job"]["id"],
+            },
+        )
+    except Exception as e:
+        code_pipeline.put_job_failure_result(
+            jobId=job_id,
+            failureDetails={
+                "type": "JobFailed",
+                "message": str(e),
+            },
+        )
+    else:
+        code_pipeline.put_job_success_result(
+            jobId=job_id,
+        )
     return {'hello': 'world'}
 
-
-# The view function above will return {"hello": "world"}
-# whenever you make an HTTP GET request to '/'.
-#
-# Here are a few more examples:
-#
-# @app.route('/hello/{name}')
-# def hello_name(name):
-#    # '/hello/james' -> {"hello": "james"}
-#    return {'hello': name}
-#
-# @app.route('/users', methods=['POST'])
-# def create_user():
-#     # This is the JSON body the user sent in their POST request.
-#     user_as_json = app.current_request.json_body
-#     # We'll echo the json body back to the user in a 'user' key.
-#     return {'user': user_as_json}
-#
-# See the README documentation for more examples.
-#
