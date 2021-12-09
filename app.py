@@ -19,6 +19,7 @@ code_pipeline = boto3.client("codepipeline")
 cloud_front = boto3.client("cloudfront")
 
 
+@app.lambda_function()
 def lambda_handler(event, context):
     logging.debug("AWS cloud front invalidator started with event {}".format(event))
     job_id = event["CodePipeline.job"]["id"]
@@ -31,7 +32,7 @@ def lambda_handler(event, context):
             ["configuration"]
             ["UserParameters"]
         )
-        cloud_front.create_invalidation(
+        invalidation = cloud_front.create_invalidation(
             DistributionId=user_params["distributionId"],
             InvalidationBatch={
                 "Paths": {
@@ -41,6 +42,7 @@ def lambda_handler(event, context):
                 "CallerReference": event["CodePipeline.job"]["id"],
             },
         )
+        logging.debug("Create invalidation {}".format(invalidation))
     except Exception as e:
         code_pipeline.put_job_failure_result(
             jobId=job_id,
@@ -53,10 +55,5 @@ def lambda_handler(event, context):
         code_pipeline.put_job_success_result(
             jobId=job_id,
         )
+    logging.debug("!!!!! Invalidation is complete !!!!!")
 
-
-@app.route('/')
-def index():
-    return {
-        'lambda': 'aws cloud front'
-    }
