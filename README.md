@@ -10,6 +10,8 @@ CloudFront Invalidation in CodePipeline using Lambda
 
 #### Deploy
 
+1. Make sure `~ .aws/credentials`, file contains `IAM` user with permission of `lambda, IAM role`
+
 Run `chalice deploy` to deploy your Chalice application:
 
     chalice deploy
