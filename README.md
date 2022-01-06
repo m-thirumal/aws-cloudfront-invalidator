@@ -3,6 +3,8 @@
 ![Python](https://img.shields.io/badge/-Python-333333?style=flat&logo=python)
 ![AWS Cloud](https://img.shields.io/badge/-AWS%20Cloud-333333?style=flat&logo=amazon)
 
+Clear cache from cloudfront after new code delpoy from codepipeline
+
 CloudFront Invalidation in CodePipeline using Lambda 
 
 ![Pipeline](img/code_pipline_1.png)
